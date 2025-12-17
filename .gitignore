@@ -1,3 +1,12 @@
-# Ignore Python virtual environments
+# Environment variables
+.env
+.env.local
+
+# Python
 venv/
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
 notebooks/.ipynb_checkpoints/
