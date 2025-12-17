@@ -4,4 +4,5 @@ datasets
 jupyter
 ipykernel
 python-dotenv
+openai
 git+https://github.com/PhilipQuirke/quanta_maths.git
