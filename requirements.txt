@@ -1,0 +1,7 @@
+torch
+transformers
+datasets
+jupyter
+ipykernel
+python-dotenv
+git+https://github.com/PhilipQuirke/quanta_maths.git
