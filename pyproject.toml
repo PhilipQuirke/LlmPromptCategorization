@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "LlmPromptCategorization"
+version = "1.0"
+description = "LLM Prompt Categorization tools"
+authors = [{name = "Philip Quirke et al", email = "philip@withmartian.com"}]
+dependencies = [
+    "numpy>=1.18.1",
+    "plotly",
+    "matplotlib",
+    "scikit-learn",
+    "scikit-optimize",
+    "transformers",
+    "typeguard>=3.0.2",
+    "torch>=1.10",
+    "torchtyping>=0.1.4"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]
+
+[tool.python]
+requires = ">=3.10"
+
+[tool.setuptools]
+packages = ["LlmPromptCategorization"]
+
+[tool.setuptools.package-dir]
+MathsCatGen="MathsCatGen"
