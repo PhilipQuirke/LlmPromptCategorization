@@ -30,11 +30,7 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 
-[tool.python]
-requires = ">=3.10"
+requires-python = ">=3.10"
 
 [tool.setuptools]
-packages = ["LlmPromptCategorization"]
-
-[tool.setuptools.package-dir]
-MathsCatGen="MathsCatGen"
+packages = ["MathsCatGen"]
