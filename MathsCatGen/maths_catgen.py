@@ -11,10 +11,10 @@ def get_maths_tasks():
     return [
         "minimum",
         "maximum", 
+        "average",
         "sum",
         "difference",
         "product",
-        "average",
         "exponential" # Excluded from model evaluation for now 
     ]
 
