@@ -48,5 +48,17 @@ class TestMathsCatGen(unittest.TestCase):
         self.assertIn("{y}", template)
         self.assertIn("{task}", template)
 
+    def test_generate_synthetic_data(self):
+        tasks = maths_catgen.get_maths_tasks()       
+        prompt_template = maths_catgen.get_prompt_template() 
+        maths_catgen.generate_synthetic_data(tasks, prompt_template, 4)
+
+    def test_generate_synthetic_matrix(self):
+        prompt_template = maths_catgen.get_prompt_template()   
+        maths_catgen.generate_synthetic_matrix(prompt_template, 4, 5)
+        maths_catgen.generate_synthetic_matrix(prompt_template, 4, 6)
+        maths_catgen.generate_synthetic_matrix(prompt_template, 4, 7)
+        maths_catgen.generate_synthetic_matrix(prompt_template, 4, 8)
+
 if __name__ == "__main__":
     unittest.main()

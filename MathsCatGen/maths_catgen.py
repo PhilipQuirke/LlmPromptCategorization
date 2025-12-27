@@ -3,6 +3,9 @@ import re
 from typing import List, Tuple, Optional, Dict, Any
 import random
 
+# pytest tests/test_maths_catgen.py
+
+
 MIN_TASK = "minimum"
 MAX_TASK = "maximum"
 AVG_TASK = "average"
@@ -175,7 +178,7 @@ def generate_synthetic_matrix(prompt_template, n_examples: int = 200, n_tasks: i
         pairs = [(min(x,21), min(y, 12)) for x, y in pairs]
 
     for x, y in pairs:
-        prompt = prompt_template.format(x=x, y=y)
+        prompt = prompt_template.format(x=x, y=y, task="{task}")
 
         min_ground_truth = calculate_ground_truth(x, y, MIN_TASK)
         max_ground_truth = calculate_ground_truth(x, y, MAX_TASK) 
@@ -206,7 +209,7 @@ def generate_synthetic_matrix(prompt_template, n_examples: int = 200, n_tasks: i
         })
     
     df = pd.DataFrame(all_data)
-    print(f"\nGenerated {len(df)} total examples across {len(tasks)} tasks")
-    print(f"Examples per task: {df['task'].value_counts().to_dict()}")
+    print(f"\nGenerated {len(df)} total examples across {n_tasks} tasks")
+    print(f"Examples per task: {df['x'].value_counts().to_dict()}")
     
     return df
