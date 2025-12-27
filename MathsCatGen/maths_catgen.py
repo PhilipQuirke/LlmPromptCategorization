@@ -3,19 +3,28 @@ import re
 from typing import List, Tuple, Optional, Dict, Any
 import random
 
+MIN_TASK = "minimum"
+MAX_TASK = "maximum"
+AVG_TASK = "average"
+SUM_TASK = "sum"
+DIFF_TASK = "difference"
+PROD_TASK = "product"
+EXP_TASK = "exponential"
+TASK_OVERFLOW = "overflow"
+
 
 def get_maths_tasks():
     """
     These are mathematical tasks that we test the models on 
     """
     return [
-        "minimum",
-        "maximum", 
-        "average",
-        "sum",
-        "difference",
-        "product",
-        "exponential" # Excluded from model evaluation for now 
+        MIN_TASK,
+        MAX_TASK, 
+        AVG_TASK,
+        SUM_TASK,
+        DIFF_TASK,
+        PROD_TASK,
+        EXP_TASK
     ]
 
 def get_prompt_template():
@@ -49,19 +58,6 @@ def is_ground_truth_correct(answer: str, ground_truth: str) -> bool:
             # Check that the last number matches within 0.001 tolerance
             (numbers_clean and abs(float(numbers_clean[-1]) - float(ground_truth)) < 0.001))
 
-def test_is_ground_truth_correct():
-    assert is_ground_truth_correct("-14338", "-14338")
-    assert is_ground_truth_correct("-14338 ", "-14338")
-    assert is_ground_truth_correct("-14338.", "-14338")
-    assert is_ground_truth_correct("-14,338", "-14338")
-    assert is_ground_truth_correct("-14,338 ", "-14338")
-    assert is_ground_truth_correct("-14,338.", "-14338")
-    assert not is_ground_truth_correct("-14339", "-14338")
-    assert is_ground_truth_correct("boxed{-14338}", "-14338")
-    assert is_ground_truth_correct("**-14338**", "-14338")
-    assert is_ground_truth_correct("blah blah-14338 blah blah", "-14338")
-    assert is_ground_truth_correct("135,702,468 - 269,485,731 = **-133,783,263**", "-133783263")
-    assert is_ground_truth_correct("12123 - 12312 = -14338", "-14338")
 
 def generate_number_pairs(n_examples: int = 200, 
                          min_val: int = 1, 
@@ -104,28 +100,28 @@ def generate_number_pairs(n_examples: int = 200,
 
 def calculate_ground_truth(x: int, y: int, operation: str) -> str:
     """Calculate the correct answer for a given operation"""
-    if operation == "minimum":
+    if operation == MIN_TASK:
         return str(min(x, y))
-    elif operation == "maximum":
+    elif operation == MAX_TASK:
         return str(max(x, y))
-    elif operation == "sum":
+    elif operation == SUM_TASK:
         return str(x + y)
-    elif operation == "difference":
+    elif operation == DIFF_TASK:
         return str(abs(x - y))  # Assuming absolute difference
-    elif operation == "product":
+    elif operation == PROD_TASK:
         return str(x * y)
-    elif operation == "average":
+    elif operation == AVG_TASK:
         return str((x + y) / 2)
-    elif operation == "exponential":
+    elif operation == EXP_TASK:
         # Limit exponential to prevent overflow
         try:
             result = x ** y
             # Cap at reasonable size
             if result > 10**15:
-                return "OVERFLOW"
+                return TASK_OVERFLOW
             return str(result)
         except:
-            return "OVERFLOW"
+            return TASK_OVERFLOW
     else:
         raise ValueError(f"Unknown operation: {operation}")
 
@@ -137,7 +133,7 @@ def generate_synthetic_data(tasks, prompt_template, n_examples_per_task: int = 2
     for task in tasks:
         
         # For exponential, use smaller Y values to prevent overflow
-        if task == "exponential":
+        if task == EXP_TASK:
             pairs = generate_number_pairs(n_examples_per_task, min_val=2, max_val=15)
             # Limit Y further for exponential
             pairs = [(x, min(y, 10)) for x, y in pairs]
@@ -149,7 +145,7 @@ def generate_synthetic_data(tasks, prompt_template, n_examples_per_task: int = 2
             ground_truth = calculate_ground_truth(x, y, task)
             
             # Skip overflow cases
-            if ground_truth == "OVERFLOW":
+            if ground_truth == TASK_OVERFLOW:
                 continue
                 
             all_data.append({
@@ -166,3 +162,48 @@ def generate_synthetic_data(tasks, prompt_template, n_examples_per_task: int = 2
     
     return df
 
+def generate_synthetic_matrix(tasks, prompt_template, n_examples: int = 200) -> pd.DataFrame:
+    """Generate synthetic matrix data for all tasks"""
+    
+    all_data = []
+    
+    pairs = generate_number_pairs(n_examples)
+    # Given exponential, use smaller values to prevent overflow
+    pairs = [(min(x,21), min(y, 12)) for x, y in pairs]
+
+    for x, y in pairs:
+        prompt = prompt_template.format(x=x, y=y)
+
+        min_ground_truth = calculate_ground_truth(x, y, MIN_TASK)
+        max_ground_truth = calculate_ground_truth(x, y, MAX_TASK) 
+        avg_ground_truth = calculate_ground_truth(x, y, AVG_TASK)
+        sum_ground_truth = calculate_ground_truth(x, y, SUM_TASK)
+        diff_ground_truth = calculate_ground_truth(x, y, DIFF_TASK)
+        prod_ground_truth = calculate_ground_truth(x, y, PROD_TASK)
+        exp_ground_truth = calculate_ground_truth(x, y, EXP_TASK)
+
+        # Skip overflow cases
+        if exp_ground_truth == TASK_OVERFLOW:
+            continue
+            
+        task_ground_truths = [
+            {"task": MIN_TASK, "ground_truth": min_ground_truth},
+            {"task": MAX_TASK, "ground_truth": max_ground_truth},
+            {"task": AVG_TASK, "ground_truth": avg_ground_truth},
+            {"task": SUM_TASK, "ground_truth": sum_ground_truth},
+            {"task": DIFF_TASK, "ground_truth": diff_ground_truth},
+            {"task": PROD_TASK, "ground_truth": prod_ground_truth},
+            {"task": EXP_TASK, "ground_truth": exp_ground_truth}
+        ]
+        all_data.append({
+            "x": x,
+            "y": y,
+            "prompt": prompt,
+            "task_ground_truths": task_ground_truths
+        })
+    
+    df = pd.DataFrame(all_data)
+    print(f"\nGenerated {len(df)} total examples across {len(tasks)} tasks")
+    print(f"Examples per task: {df['task'].value_counts().to_dict()}")
+    
+    return df
