@@ -10,6 +10,7 @@ SUM_TASK = "sum"
 DIFF_TASK = "difference"
 PROD_TASK = "product"
 EXP_TASK = "exponential"
+NUM_TASKS = 7
 TASK_OVERFLOW = "overflow"
 
 
@@ -162,14 +163,16 @@ def generate_synthetic_data(tasks, prompt_template, n_examples_per_task: int = 2
     
     return df
 
-def generate_synthetic_matrix(tasks, prompt_template, n_examples: int = 200) -> pd.DataFrame:
+def generate_synthetic_matrix(tasks, prompt_template, n_examples: int = 200, n_tasks: int = NUM_TASKS ) -> pd.DataFrame:
     """Generate synthetic matrix data for all tasks"""
     
     all_data = []
     
     pairs = generate_number_pairs(n_examples)
-    # Given exponential, use smaller values to prevent overflow
-    pairs = [(min(x,21), min(y, 12)) for x, y in pairs]
+    use_exponential = n_tasks >= NUM_TASKS
+    if use_exponential:
+        # Given exponential, use smaller values to prevent overflow
+        pairs = [(min(x,21), min(y, 12)) for x, y in pairs]
 
     for x, y in pairs:
         prompt = prompt_template.format(x=x, y=y)
@@ -182,10 +185,6 @@ def generate_synthetic_matrix(tasks, prompt_template, n_examples: int = 200) -> 
         prod_ground_truth = calculate_ground_truth(x, y, PROD_TASK)
         exp_ground_truth = calculate_ground_truth(x, y, EXP_TASK)
 
-        # Skip overflow cases
-        if exp_ground_truth == TASK_OVERFLOW:
-            continue
-            
         task_ground_truths = [
             {"task": MIN_TASK, "ground_truth": min_ground_truth},
             {"task": MAX_TASK, "ground_truth": max_ground_truth},
@@ -193,8 +192,12 @@ def generate_synthetic_matrix(tasks, prompt_template, n_examples: int = 200) -> 
             {"task": SUM_TASK, "ground_truth": sum_ground_truth},
             {"task": DIFF_TASK, "ground_truth": diff_ground_truth},
             {"task": PROD_TASK, "ground_truth": prod_ground_truth},
-            {"task": EXP_TASK, "ground_truth": exp_ground_truth}
         ]
+        if use_exponential:
+            task_ground_truths += [
+                {"task": EXP_TASK, "ground_truth": exp_ground_truth}
+                ]
+        
         all_data.append({
             "x": x,
             "y": y,
