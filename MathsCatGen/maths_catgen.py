@@ -48,13 +48,13 @@ def is_ground_truth_correct(answer: str, ground_truth: str) -> bool:
     # Remove commas from the numbers for comparison
     numbers_clean = [num.replace(',', '') for num in numbers]
 
-    answer_no_comma = answer.replace(",", "")
+    answer_no_comma = " " + answer.replace(",", "") + " "
 
     return (ground_truth == answer_no_comma or
             "**"+ground_truth+"**" in answer or
             "boxed{"+ground_truth+"}" in answer or
-            ""+ground_truth+" " in answer_no_comma  or
-            ""+ground_truth+"." in answer_no_comma  or
+            " "+ground_truth+" " in answer_no_comma  or
+            " "+ground_truth+"." in answer_no_comma  or
             # Check that the last number matches within 0.001 tolerance
             (numbers_clean and abs(float(numbers_clean[-1]) - float(ground_truth)) < 0.001))
 

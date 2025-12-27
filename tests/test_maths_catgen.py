@@ -15,6 +15,8 @@ class TestMathsCatGen(unittest.TestCase):
         self.assertTrue(maths_catgen.is_ground_truth_correct("blah blah-14338 blah blah", "-14338"))
         self.assertTrue(maths_catgen.is_ground_truth_correct("135,702,468 - 269,485,731 = **-133,783,263**", "-133783263"))
         self.assertTrue(maths_catgen.is_ground_truth_correct("12123 - 12312 = -14338", "-14338"))
+        self.assertFalse(maths_catgen.is_ground_truth_correct("2", "12"))
+        
 
     def test_calculate_ground_truth(self):
         self.assertEqual(maths_catgen.calculate_ground_truth(2, 3, maths_catgen.MIN_TASK), "2")
