@@ -163,7 +163,7 @@ def generate_synthetic_data(tasks, prompt_template, n_examples_per_task: int = 2
     
     return df
 
-def generate_synthetic_matrix(tasks, prompt_template, n_examples: int = 200, n_tasks: int = NUM_TASKS ) -> pd.DataFrame:
+def generate_synthetic_matrix(prompt_template, n_examples: int = 200, n_tasks: int = NUM_TASKS ) -> pd.DataFrame:
     """Generate synthetic matrix data for all tasks"""
     
     all_data = []
