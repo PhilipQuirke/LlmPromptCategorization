@@ -60,6 +60,7 @@ def is_ground_truth_correct(answer: str, ground_truth: str) -> bool:
         "boxed{"+ground_truth+"}" in answer or
         " "+ground_truth+" " in answer_no_comma  or
         " "+ground_truth+"\n" in answer_no_comma  or
+        " "+ground_truth+")" in answer_no_comma  or
         " "+ground_truth+"." in answer_no_comma  or
         (
             numbers_clean and
