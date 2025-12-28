@@ -54,13 +54,23 @@ def is_ground_truth_correct(answer: str, ground_truth: str) -> bool:
 
     answer_no_comma = " " + answer.replace(",", "") + " "
 
-    return (ground_truth == answer_no_comma or
-            "**"+ground_truth+"**" in answer or
-            "boxed{"+ground_truth+"}" in answer or
-            " "+ground_truth+" " in answer_no_comma  or
-            " "+ground_truth+"." in answer_no_comma  or
-            # Check that the last number matches within 0.001 tolerance
-            (numbers_clean and abs(float(numbers_clean[-1]) - float(ground_truth)) < 0.001))
+    return (
+        ground_truth == answer_no_comma or
+        "**"+ground_truth+"**" in answer or
+        "boxed{"+ground_truth+"}" in answer or
+        " "+ground_truth+" " in answer_no_comma  or
+        " "+ground_truth+"." in answer_no_comma  or
+        (
+            numbers_clean and
+            _is_last_number_close(numbers_clean[-1], ground_truth)
+        )
+    )
+
+def _is_last_number_close(last_number: str, ground_truth: str) -> bool:
+    try:
+        return abs(float(last_number) - float(ground_truth)) < 0.001
+    except (ValueError, TypeError):
+        return False
 
 
 def generate_number_pairs(n_examples: int = 200, 
@@ -210,6 +220,5 @@ def generate_synthetic_matrix(prompt_template, n_examples: int = 200, n_tasks: i
     
     df = pd.DataFrame(all_data)
     print(f"\nGenerated {len(df)} total examples across {n_tasks} tasks")
-    print(f"Examples per task: {df['x'].value_counts().to_dict()}")
     
     return df
